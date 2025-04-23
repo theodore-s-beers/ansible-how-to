@@ -1,7 +1,11 @@
 import marimo
 
 __generated_with = "0.13.1"
-app = marimo.App(width="medium", app_title="Ansible How-to")
+app = marimo.App(
+    width="medium",
+    app_title="Ansible How-to",
+    auto_download=["html"],
+)
 
 
 @app.cell
