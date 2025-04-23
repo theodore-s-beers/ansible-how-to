@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.13.0"
+__generated_with = "0.13.1"
 app = marimo.App(width="medium", app_title="Ansible How-to")
 
 
@@ -39,11 +39,11 @@ def _(mo):
         - You should now be able to run a playbook, e.g. the following, which just gathers some system info about each of our servers: `ansible-playbook playbooks/info.yml`
         - If it’s your first time, follow along with what Ansible is doing. It will print output as it “gathers info” about each host (i.e., ensures that it can actually access the host as specified in the inventory), then as it performs each defined task on each host.
 
-        ### Enhancement: `tmux`
+        ### Enhancement: tmux
 
-        - Sometimes an Ansible playbook can take a while to run, depending on what it’s doing. You may not want to be forced to sit and watch it. For this reason (and others), it’s a good idea to run playbooks in `tmux` sessions.
-        - An introduction to `tmux` is out of scope here, but basically, you can: start a new `tmux` session; set up and/or activate the venv; start running a playbook; and detach from the session. It will continue running in the background, and you can re-attach to it at any point.
-        - `tmux` is cool; please consider using it in a variety of contexts, not just for Ansible.
+        - Sometimes an Ansible playbook can take a while to run, depending on what it’s doing. You may not want to be forced to sit and watch it. For this reason (and others), it’s a good idea to run playbooks in tmux sessions.
+        - An introduction to tmux is out of scope here, but basically, you can: start a new tmux session; set up and/or activate the Python virtual environment; start running a playbook; and detach from the session. It will continue running in the background, and you can re-attach to it at any point.
+        - tmux is cool; please consider using it in a variety of contexts, not just for Ansible.
 
         ## Ansible core config
 
@@ -140,9 +140,37 @@ def _(mo):
 
         **The bottom line is that you need to be very, very careful and meticulous.** This isn’t rocket science, but writing a new playbook or making changes to an existing one demands your full attention.
 
-        ## Setting up SSH access to hosts
+        ## Backtrack: Setting up SSH access to hosts
 
-        _To be continued..._
+        As was noted above, when we declare a host in our inventory that looks like the following:
+
+        ```ini
+        foo ansible_host=foo.cs.example.edu ansible_port=8989 ansible_user=adm
+        ```
+
+        ... that corresponds to Ansible running an SSH login like so:
+
+        ```sh
+        ssh -p 8989 adm@foo.cs.example.edu
+        ```
+
+        In order for this to work, obviously, the **public key** of the `ansible` user on the control node needs to be listed among the `authorized_keys` for user `adm` (in this example) on the server at `foo.cs.example.edu`. There are various ways of getting the key placed where it needs to be (in this example, `/home/adm/.ssh/authorized_keys` on the host); suffice it to say that it needs to be done one way or another.
+
+        A final consideration is that the Ansible user on the host side—which we’ve been calling `adm` in these examples—should have **passwordless sudo**. This will allow Ansible to escalate privileges for tasks that require it (e.g. `apt update`).
+
+        ## Conclusion
+
+        For members of our team who may need to interact with our Ansible setup, the process would be roughly as follows:
+
+        - SSH into the control node
+        - Switch to the `ansible` user
+        - Start a tmux session, or attach to an existing one
+        - Set up a Python virtual environment (with `uv`) and install Ansible, or activate an existing venv
+        - Review the Ansible core config at `~/.ansible.cfg` if necessary; likewise the inventory of hosts at `~/inventory.ini`
+        - Review the existing playbooks in the directory `~/playbooks`
+        - Make any necessary additions or changes, **taking great care**
+        - Run playbooks as appropriate, using commands of the format `ansible-playbook playbooks/info.yml`. Remember that you can add the `--limit` option to stipulate that a playbook should be run only on certain hosts (overriding the target hosts specified in the playbook YAML itself).
+        - Feel free to detach from the tmux session (Ctrl+B then D); any running playbook will continue. You can then even exit your SSH session on the control node without interrupting work.
         """
     )
     return
