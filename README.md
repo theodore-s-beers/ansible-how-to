@@ -1,5 +1,11 @@
 # Ansible How-to
 
+I've been writing this documentation in the form of a
+[marimo](https://marimo.io/) notebook, as a way of exploring this promising
+alternative to Jupyter notebooks.
+
+## Instructions
+
 Set up virtual environment:
 
 ```sh
